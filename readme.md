@@ -40,6 +40,11 @@ Now test if the connection is successful by
 composer network ping --card resourceServer1@hypervault
 ```
 
+Finally start the REST server by 
+
+```
+composer-rest-server -c resourceServer1@hypervault
+```
 
 ## Troubleshooting
 
