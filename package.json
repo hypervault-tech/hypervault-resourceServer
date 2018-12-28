@@ -1,0 +1,22 @@
+{
+  "name": "hypervault-resouceserver",
+  "version": "0.0.1",
+  "description": "Resource Server in hypervault",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lixiii/hypervault-resouceServer.git"
+  },
+  "author": "hypervault",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lixiii/hypervault-resouceServer/issues"
+  },
+  "homepage": "https://github.com/lixiii/hypervault-resouceServer#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
