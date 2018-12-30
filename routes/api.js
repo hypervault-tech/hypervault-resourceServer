@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const request = require("request-promise");
-const resourceController = require("../controllers/resourceController");
-const hypervaultAPIurl = resourceController.hypervaultAPIurl;
+const wrapper = require("../controllers/wrapper");
+const hypervaultAPIurl = wrapper.hypervaultAPIurl;
 
 // define the home page route
 router.get('/', function (req, res) {
@@ -16,7 +16,7 @@ module.exports = router;
 
 
 async function testHandler(req, res) {
-  await resourceController.updateResource("file1");
-  const resources = await resourceController.getAllResources();
+  await wrapper.updateResource("file1");
+  const resources = await wrapper.getAllResources();
   return res.send(resources);
 }

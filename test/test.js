@@ -7,30 +7,30 @@ const should = chai.should();
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 
-const resourceController = require("../controllers/resourceController");
+const wrapper = require("../controllers/wrapper");
 
 describe("Hypervault Resource Server", ()=> {
 
-  describe("# resourceController", () => {
+  describe("# wrapper", () => {
 
     it("- getAllResources(): should return at least 2 resources", async () => {  
-      const resources = await resourceController.getAllResources();
+      const resources = await wrapper.getAllResources();
       expect(resources.length).to.be.at.least(2);
     });
 
     it("- getResource( 'file1' ): should return a resource with id 'file1'", async () => {  
-      const resource = await resourceController.getResource("file1");
+      const resource = await wrapper.getResource("file1");
       expect(resource).to.have.property("resourceId");
     });
 
     it("- getResource( 'fileThatDoesNotExist' ): should return null", async () => {  
-      const resource = await resourceController.getResource("fileThatDoesNotExist");
+      const resource = await wrapper.getResource("fileThatDoesNotExist");
       expect(resource).to.be.null;
     });
 
     it("- updateResource('file1'): The status of file1 should become 'AVAILABLE' ", async () => {  
-      resourceController.updateResource("file1").should.eventually.be.fulfilled;
-      const resource = await resourceController.getResource("file1");
+      wrapper.updateResource("file1").should.eventually.be.fulfilled;
+      const resource = await wrapper.getResource("file1");
       expect( resource.status ).to.equal("AVAILABLE");
     });
 
