@@ -18,6 +18,7 @@
   "homepage": "https://github.com/lixiii/hypervault-resouceServer#readme",
   "dependencies": {
     "express": "^4.16.4",
+    "mkdirp": "^0.5.1",
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
   }
