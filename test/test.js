@@ -39,6 +39,16 @@ describe("Hypervault Resource Server", ()=> {
       expect(isValid).to.be.true;
     });
 
+    it("- getResourceOwner('file1'): should return an User object with userId 'user1'", async () => {  
+      const user = await wrapper.getResourceOwner("file1");
+      expect(user.userId).to.equal("user1");
+      user.should.have.property("pubKey");
+    });
+
+    it("- getResourceOwner('fileThatDoesNotExist'): should raise an error and the promise rejected", async () => {  
+      wrapper.getResourceOwner("fileThatDoesNotExist").should.eventually.be.rejected;
+    });
+
     describe("# Util: utility functions", ()=> {
       it("getIdentifier should get the correct identifier 'user1' from example 'resource:tech.hypervault.User#user1'", async () => {  
         expect(wrapper.util.getIdentifier("resource:tech.hypervault.User#user1")).to.equal("user1");

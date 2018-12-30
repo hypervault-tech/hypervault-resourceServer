@@ -65,6 +65,24 @@ async function verifyPendingRequest(requestTransactionId) {
   }
 }
 
+/**
+ * Returns the owner of the resource. If either resource or the owner does not exist, an ERROR is raised. 
+ * @param {String} resourceId 
+ */
+async function getResourceOwner(resourceId) {
+  try {
+    const resource = await getResource(resourceId);
+    if(resource != null) {
+      // attempt to get owner
+      const userId = getIdentifier(resource.owner);
+      const resString = await request.get(hypervaultAPIurl + "tech.hypervault.User/" + userId);
+      return JSON.parse(resString);
+    }
+  }catch(e) {
+    throw e;
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // Utility functions
 ///////////////////////////////////////////////////////////////////////////
@@ -91,6 +109,7 @@ module.exports = {
   getAllResources: getAllResources,
   getResource:getResource,
   verifyPendingRequest: verifyPendingRequest,
+  getResourceOwner:getResourceOwner,
 
   // utility functions
   util: util,
