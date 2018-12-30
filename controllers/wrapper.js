@@ -65,6 +65,25 @@ async function verifyPendingRequest(requestTransactionId) {
   }
 }
 
+///////////////////////////////////////////////////////////////////////////
+// Utility functions
+///////////////////////////////////////////////////////////////////////////
+
+/**
+ * Gets the identifier from a given relationship. For the example below, this will return "user1"
+ * @param {String} relationshipIdentifier - example "resource:tech.hypervault.User#user1"
+ */
+function getIdentifier( relationshipIdentifier ) {
+  const idArr = relationshipIdentifier.split("#");
+  idArr.splice(0,1);
+  return idArr.join("#");
+}
+
+const util = {
+  getIdentifier: getIdentifier,
+}
+
+
 // export the methods
 module.exports = {
   updateResource: updateResource,
@@ -72,4 +91,7 @@ module.exports = {
   getAllResources: getAllResources,
   getResource:getResource,
   verifyPendingRequest: verifyPendingRequest,
+
+  // utility functions
+  util: util,
 }

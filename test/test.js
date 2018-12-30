@@ -39,6 +39,15 @@ describe("Hypervault Resource Server", ()=> {
       expect(isValid).to.be.true;
     });
 
+    describe("# Util: utility functions", ()=> {
+      it("getIdentifier should get the correct identifier 'user1' from example 'resource:tech.hypervault.User#user1'", async () => {  
+        expect(wrapper.util.getIdentifier("resource:tech.hypervault.User#user1")).to.equal("user1");
+      });
+
+      it("for special case 'resource:tech.hypervault.User#user##2' getIdentifier should still work", async () => {  
+        expect(wrapper.util.getIdentifier("resource:tech.hypervault.User#user##2")).to.equal("user##2");        
+      });
+    });
   });
 
   describe("# fileUtils", () => {
