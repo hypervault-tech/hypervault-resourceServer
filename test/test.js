@@ -34,5 +34,10 @@ describe("Hypervault Resource Server", ()=> {
       expect( resource.status ).to.equal("AVAILABLE");
     });
 
+    it("- verifyPendingRequest: Request with id '...bb75' should be valid", async () => {  
+      const isValid = await wrapper.verifyPendingRequest("3cb701d51dc94495dbdb25c614232757e8964dd9164457be830fc80f2dbebb75");
+      expect(isValid).to.be.true;
+    });
+
   });
 });

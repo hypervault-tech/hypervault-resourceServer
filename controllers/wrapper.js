@@ -46,10 +46,30 @@ async function getResource(resourceId) {
   }
 }
 
+/**
+ * This async function queries the ledger to see if the request asset exists and if it does, it check if the status if "PENDING". 
+ * If the request is valid, this function returns true, otherwise it will return false. If an error has occurred, an exception will be raised. 
+ * @param {String} requestTransactionId - the transactionId (the identifier) of the Request asset
+ */
+async function verifyPendingRequest(requestTransactionId) {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Request/" + requestTransactionId);
+    const pRequest = JSON.parse(resString);
+    if(pRequest.status === "PENDING") {
+      return true;
+    } else {
+      return false;
+    }
+  } catch(e) {
+    throw e;
+  }
+}
+
 // export the methods
 module.exports = {
   updateResource: updateResource,
   hypervaultAPIurl: hypervaultAPIurl,
   getAllResources: getAllResources,
   getResource:getResource,
+  verifyPendingRequest: verifyPendingRequest,
 }
