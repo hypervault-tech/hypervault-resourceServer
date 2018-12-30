@@ -29,9 +29,27 @@ async function getAllResources() {
   return JSON.parse(resString);
 }
 
+/**
+ * Get the resource with some resourceId. Returns `null` if none is found, but throws an error if an error occurs. 
+ * @param {String} resourceId 
+ */
+async function getResource(resourceId) {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId);
+    return JSON.parse(resString);
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return null;
+    } else {
+      throw e;
+    }
+  }
+}
+
 // export the methods
 module.exports = {
   updateResource: updateResource,
   hypervaultAPIurl: hypervaultAPIurl,
   getAllResources: getAllResources,
+  getResource:getResource,
 }
