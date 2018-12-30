@@ -2,12 +2,12 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const chaiAsPromised = require("chai-as-promised");
  
-const server = require('../server');
 const should = chai.should();
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 
 const wrapper = require("../controllers/wrapper");
+const fileUtils = require("../controllers/fileUtils");
 
 describe("Hypervault Resource Server", ()=> {
 
@@ -39,5 +39,11 @@ describe("Hypervault Resource Server", ()=> {
       expect(isValid).to.be.true;
     });
 
+  });
+
+  describe("# fileUtils", () => {
+    it("should give the correct hash (...47a2) of the file _testFile.txt", () => {  
+      expect(fileUtils.hashFile("./_testFile.txt")).to.equal("b1549ed4c79125e9d2e6fd38b00eeca6c0d88cce7e2f7ff3e5da0c49b3c247a2");
+    });
   });
 });
