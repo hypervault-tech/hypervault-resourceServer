@@ -16,7 +16,27 @@ module.exports = router;
 
 
 async function testHandler(req, res) {
-  const resString = await request.get(hypervaultAPIurl+"tech.hypervault.User");
-  const users = JSON.parse(resString);
-  return res.send(users);
+  await updateResource("file1");
+  const resString = await request.get(hypervaultAPIurl+"tech.hypervault.Resource");
+  const resources = JSON.parse(resString);
+  return res.send(resources);
+}
+
+/**
+ * This async function submits a PUT request to the API and updates the status of the resource with `resourceId` to "AVAILABLE"
+ * @param {String} resourceId 
+ */
+async function updateResource(resourceId) {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId);
+    const resource = JSON.parse(resString); 
+    resource.status = "AVAILABLE";
+    await request.put(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId, {
+      json: true,
+      body: resource
+    });
+  } catch(e) {
+    throw e;
+  }
+  
 }
