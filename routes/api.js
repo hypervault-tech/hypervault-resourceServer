@@ -49,22 +49,26 @@ async function uploadHandler(req, res) {
     const resource = await wrapper.getResource(resourceId);
     // next check if the resource exists
     if(resource == null) {
+      await unlink(req.file.path);
       return res.status(404).send("No resource is found with the given resourceId.");
     }
     // next check status of resource
     if(resource.status !== "PENDING_TRANSFER") {
+      await unlink(req.file.path);
       return res.status(400).send(`Resource status needs to be "PENDING_TRANSFER" for the resource to be accepted. `)
     } 
     // proceed to check if owner exists
     try {
       const user = await wrapper.getResourceOwner(resourceId);
     } catch(e) {
+      await unlink(req.file.path);
       return res.status(400).send(`Something is wrong with the owner of the resource as the database gives an error when trying to read the user details.`);
     }
 
     // Finally check hash of the file
     const filehash = fileUtil.hashFile( req.file.path );
     if(filehash !== resource.resourceId) {
+      await unlink(req.file.path);
       return res.status(400).send("The filehash does not match the resourceId. ");
     } 
 
