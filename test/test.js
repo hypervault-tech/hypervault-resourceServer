@@ -16,6 +16,15 @@ describe("Hypervault Resource Server", ()=> {
 
   describe("# wrapper", () => {
 
+    before(async () => {
+      try {
+        // Reset the status of 'file1'
+        await wrapper.devOnly.putResource("file1", "PENDING_TRANSFER");
+      } catch(e) {
+        throw e;
+      }
+    });
+
     it("- getAllResources(): should return at least 2 resources", async () => {  
       const resources = await wrapper.getAllResources();
       expect(resources.length).to.be.at.least(2);
@@ -32,7 +41,7 @@ describe("Hypervault Resource Server", ()=> {
     });
 
     it("- updateResource('file1'): The status of file1 should become 'AVAILABLE' ", async () => {  
-      wrapper.updateResource("file1").should.eventually.be.fulfilled;
+      await wrapper.updateResource("file1").should.eventually.be.fulfilled;
       const resource = await wrapper.getResource("file1");
       expect( resource.status ).to.equal("AVAILABLE");
     });
@@ -80,42 +89,36 @@ describe("Hypervault Resource Server", ()=> {
     describe("/upload", () => {
       before(async () => {
         try {
-          await wrapper.devOnly.putResource("f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6", "PENDING_TRANSFER");
+          await wrapper.devOnly.putResource("b1549ed4c79125e9d2e6fd38b00eeca6c0d88cce7e2f7ff3e5da0c49b3c247a2", "PENDING_TRANSFER");
         } catch(e) {
           throw e;
         }
       });
 
-      it("should return 404 when resource does not exist", async () => {  
-        chai.request(server).post("/api/upload/fileThatDoesNotExist").send().end( (err, res) => {
-          expect(res.status).to.equal(404);
-        });
+      it("should return 400 when no file is attached but a resourceId is valid", async () => {  
+        const res = await chai.request(server).post("/api/upload/b1549ed4c79125e9d2e6fd38b00eeca6c0d88cce7e2f7ff3e5da0c49b3c247a2");
+        res.status.should.equal(400);
+        res.text.should.equal("One and only one attached file is required. ");
       });
 
-      it("should return 400 when no file is attached but a resourceId is valid", async () => {  
-        chai.request(server).post("/api/upload/f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6")
-          .end( (err,res) => {
-              res.status.should.equal(400);
-              res.text.should.equal("One and only one attached file is required. ");
-          });
+      it("should return 404 when resource does not exist", async () => {  
+        const res = await chai.request(server).post("/api/upload/fileThatDoesNotExist")
+          .attach("resource",  fs.readFileSync('./package.json'), "testfile");
+        expect(res.status).to.equal(404);
       });
 
       it("should return 400 when file hash does not match resourceId", async () => {  
-        chai.request(server).post("/api/upload/f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6")
-          .attach("resource",  fs.readFileSync('./package.json'), "testfile")
-          .end((err, res) => {
-            res.status.should.equal(400);
-            res.text.should.equal("The filehash does not match the resourceId. ");
-          });
+        const res = await chai.request(server).post("/api/upload/b1549ed4c79125e9d2e6fd38b00eeca6c0d88cce7e2f7ff3e5da0c49b3c247a2")
+          .attach("resource",  fs.readFileSync('./package.json'), "testfile");
+        res.status.should.equal(400);
+        res.text.should.equal("The filehash does not match the resourceId. ");
       });
 
       it("should return 201 when the file is successfully uploaded", async () => {  
-        chai.request(server).post("/api/upload/f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6")
-          .attach("resource",  fs.readFileSync('./_testFile.txt'), "_testFile.txt")
-          .end((err, res) => {
-            res.status.should.equal(201);
-            res.text.should.equal("f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6");
-          });
+        const res = await chai.request(server).post("/api/upload/b1549ed4c79125e9d2e6fd38b00eeca6c0d88cce7e2f7ff3e5da0c49b3c247a2")
+          .attach("resource",  fs.readFileSync('./_testFile.txt'), "_testFile.txt");
+        res.status.should.equal(201);
+        res.text.should.equal("b1549ed4c79125e9d2e6fd38b00eeca6c0d88cce7e2f7ff3e5da0c49b3c247a2");
       });
     });
   });
