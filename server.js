@@ -6,6 +6,7 @@ const mkdirp = require('mkdirp');
 // first attempt to make ./resources/ directory to store all the files
 try {
   mkdirp.sync("./resources");
+  mkdirp.sync("./temp");  // place to temporarily hold all uploads: if the uploaded file has a hash matching that declared in the blockchain, it will be copied t the resources folder
 } catch (e) {
   throw e;
 }
@@ -15,3 +16,5 @@ const apiRouter = require("./routes/api");
 app.use("/api", apiRouter);
 
 app.listen(port, () => console.log(`Hypervault ResourceServer listening on port ${port}!`));
+
+module.exports = app; // for Mocha testing purposes only

@@ -1,5 +1,6 @@
 const request = require("request-promise");
-const hypervaultAPIurl = "http://resourceserver.hypervault.tech:3000/api/";
+// const hypervaultAPIurl = "http://resourceserver.hypervault.tech:3000/api/";
+const hypervaultAPIurl = "http://hypervault.tech:3000/api/";
 // const hypervaultAPIurl = "http://localhost:3000/api/";
 
 
@@ -83,6 +84,24 @@ async function getResourceOwner(resourceId) {
   }
 }
 
+
+/**
+ * Example response from the ping request
+ * {
+      "version": "0.20.5",
+      "participant": "org.hyperledger.composer.system.NetworkAdmin#admin",
+      "identity": "org.hyperledger.composer.system.Identity#761644569f44e292d41a99402fb9df22810312dcc4ebe4a28347b4b7cbec6175"
+    }
+ */
+async function pingNetwork() {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "system/ping");
+    return JSON.parse(resString);
+  } catch(e) {
+    throw e;
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // Utility functions
 ///////////////////////////////////////////////////////////////////////////
@@ -110,6 +129,7 @@ module.exports = {
   getResource:getResource,
   verifyPendingRequest: verifyPendingRequest,
   getResourceOwner:getResourceOwner,
+  pingNetwork: pingNetwork,
 
   // utility functions
   util: util,
