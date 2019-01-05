@@ -2,13 +2,14 @@ const express = require('express');
 const router = express.Router();
 const wrapper = require("../controllers/wrapper");
 const package = require("../package.json");
+const fileUtil = require("../controllers/fileUtils");
 
 const multer  = require('multer');
 const upload = multer({ dest: './temp/' });
 
 router.get('/', async function (req, res) {
   pingResponse = await wrapper.pingNetwork();
-  res.status(200).send({
+  return res.status(200).send({
     version: package.version,
     serverParticipant: pingResponse.participant
   });
@@ -37,24 +38,35 @@ async function uploadHandler(req, res) {
     const resource = await wrapper.getResource(resourceId);
     // first check if the resource exists
     if(resource == null) {
-      res.status(404).send("No resource is found with the given resourceId.");
+      return res.status(404).send("No resource is found with the given resourceId.");
     }
     // next check status of resource
     if(resource.status !== "PENDING_TRANSFER") {
-      res.status(400).send(`Resource status needs to be "PENDING_TRANSFER" for the resource to be accepted. `)
+      return res.status(400).send(`Resource status needs to be "PENDING_TRANSFER" for the resource to be accepted. `)
     } else {
       // proceed to check if owner exists
       try {
         const user = await wrapper.getResourceOwner(resourceId);
       } catch(e) {
-        res.status(400).send(`Something is wrong with the owner of the resource as the database gives an error when trying to read the user details.`);
+        return res.status(400).send(`Something is wrong with the owner of the resource as the database gives an error when trying to read the user details.`);
       }
 
-      // next check hash of the file
-
+      // now check if the file has been uploaded
+      if (req.hasOwnProperty("file") === true) {
+        // next check hash of the file
+        const filehash = fileUtil.hashFile( req.file.path );
+        if(filehash !== resource.resourceId) {
+          return res.status(400).send("The filehash does not match the resourceId. ");
+        } else {
+          // now all checks are completed. Proceed to save the file and make it available. 
+        }
+      } else {
+        return res.status(400).send("One and only one attached file is required. ");
+      }
+      
     }
   }catch(e) {
     console.error(e);
-    res.status(500).send("Something went wrong. Please try again later.");
+    return res.status(500).send("Something went wrong. Please try again later.");
   }
 }

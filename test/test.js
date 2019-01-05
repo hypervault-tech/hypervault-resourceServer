@@ -10,6 +10,7 @@ chai.use(chaiHttp);
 const wrapper = require("../controllers/wrapper");
 const fileUtils = require("../controllers/fileUtils");
 const server = require("../server");
+const fs = require("fs");
 
 describe("Hypervault Resource Server", ()=> {
 
@@ -68,13 +69,37 @@ describe("Hypervault Resource Server", ()=> {
     });
   });
 
-  describe("# server.js", () => {
-    describe("/api/", () => {
+  describe("# server.js endpoints at /api/", () => {
+    describe("/ : API root", () => {
       it("should ping the network successfully", async () => {  
-        chai.request(server).get("/api/").send().end( (err, res) => {
-          expect(res.body).to.have.property("version");
+        res = await chai.request(server).get("/api/").send();
+        expect(res.body).to.have.property("version");
+      });
+    });
+
+    describe("/upload", () => {
+      it("should return 404 when resource does not exist", async () => {  
+        chai.request(server).post("/api/upload/fileThatDoesNotExist").send().end( (err, res) => {
+          expect(res.status).to.equal(404);
         });
       });
-    })
+
+      it("should return 400 when no file is attached but a resourceId is valid", async () => {  
+        chai.request(server).post("/api/upload/f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6")
+          .end( (err,res) => {
+              res.status.should.equal(400);
+              res.text.should.equal("One and only one attached file is required. ");
+          });
+      });
+
+      it("should return 400 when file hash does not match resourceId", async () => {  
+        chai.request(server).post("/api/upload/f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6")
+          .attach("resource",  fs.readFileSync('./package.json'), "testfile")
+          .end((err, res) => {
+            res.status.should.equal(400);
+            res.text.should.equal("The filehash does not match the resourceId. ");
+          });
+      });
+    });
   });
 });
