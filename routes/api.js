@@ -23,19 +23,11 @@ router.get('/', async function (req, res) {
 
 router.post('/upload/:resourceId', upload.single('resource'), uploadHandler);
 
-router.get('/test', testHandler);
-
 module.exports = router;
 
 ///////////////////////////////////////////////////////////////////////////
 // Route Handler functions
 ///////////////////////////////////////////////////////////////////////////
-
-async function testHandler(req, res) {
-  await wrapper.updateResource("file1");
-  const resources = await wrapper.getAllResources();
-  return res.send(resources);
-}
 
 async function uploadHandler(req, res) {
   // file is saved to ./temp
