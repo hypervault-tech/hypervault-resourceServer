@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const wrapper = require("../controllers/wrapper");
-const package = require("../package.json");
+const apiConfig = require("../config");
 const fileUtil = require("../controllers/fileUtils");
 
 const multer  = require('multer');
-const upload = multer({ dest: './temp/' });
+const upload = multer({ dest: apiConfig.tempResourcesPath });
+const fs = require("fs");
 
 router.get('/', async function (req, res) {
   pingResponse = await wrapper.pingNetwork();
   return res.status(200).send({
-    version: package.version,
+    version: apiConfig.version,
     serverParticipant: pingResponse.participant
   });
 });
@@ -59,6 +60,11 @@ async function uploadHandler(req, res) {
           return res.status(400).send("The filehash does not match the resourceId. ");
         } else {
           // now all checks are completed. Proceed to save the file and make it available. 
+          await fs.copyFile(req.file.path, `${apiConfig.resourcesPath}/${resource.resourceId}`);
+          await fs.unlink(req.file.path);
+          await wrapper.updateResource(resource.resourceId); 
+          // now return successful response 
+          res.status(201).send(resource.resourceId);
         }
       } else {
         return res.status(400).send("One and only one attached file is required. ");

@@ -23,6 +23,25 @@ async function updateResource(resourceId) {
 }
 
 /**
+ * ONLY for testing purposes. NOT TO BE USED IN API SERVER
+ * @param {String} resourceId 
+ * @param {String} resourceStatus - one of the valid status types
+ */
+async function putResource(resourceId, resourceStatus) {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId);
+    const resource = JSON.parse(resString); 
+    resource.status = resourceStatus;
+    await request.put(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId, {
+      json: true,
+      body: resource
+    });
+  } catch(e) {
+    throw e;
+  }
+}
+
+/**
  * getAllResources from the hypervault REST API
  */
 async function getAllResources() {
@@ -78,6 +97,8 @@ async function getResourceOwner(resourceId) {
       const userId = getIdentifier(resource.owner);
       const resString = await request.get(hypervaultAPIurl + "tech.hypervault.User/" + userId);
       return JSON.parse(resString);
+    } else {
+      throw Error("Resource does not exist");
     }
   }catch(e) {
     throw e;
@@ -133,4 +154,9 @@ module.exports = {
 
   // utility functions
   util: util,
+
+  // dev only dunctions
+  devOnly: {
+    putResource: putResource
+  }
 }

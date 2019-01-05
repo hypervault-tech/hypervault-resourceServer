@@ -49,7 +49,7 @@ describe("Hypervault Resource Server", ()=> {
     });
 
     it("- getResourceOwner('fileThatDoesNotExist'): should raise an error and the promise rejected", async () => {  
-      wrapper.getResourceOwner("fileThatDoesNotExist").should.eventually.be.rejected;
+      wrapper.getResourceOwner("fileThatDoesNotExist").should.eventually.be.rejectedWith("Resource does not exist");
     });
 
     describe("# Util: utility functions", ()=> {
@@ -78,6 +78,14 @@ describe("Hypervault Resource Server", ()=> {
     });
 
     describe("/upload", () => {
+      before(async () => {
+        try {
+          await wrapper.devOnly.putResource("f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6", "PENDING_TRANSFER");
+        } catch(e) {
+          throw e;
+        }
+      });
+
       it("should return 404 when resource does not exist", async () => {  
         chai.request(server).post("/api/upload/fileThatDoesNotExist").send().end( (err, res) => {
           expect(res.status).to.equal(404);
@@ -98,6 +106,15 @@ describe("Hypervault Resource Server", ()=> {
           .end((err, res) => {
             res.status.should.equal(400);
             res.text.should.equal("The filehash does not match the resourceId. ");
+          });
+      });
+
+      it("should return 201 when the file is successfully uploaded", async () => {  
+        chai.request(server).post("/api/upload/f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6")
+          .attach("resource",  fs.readFileSync('./_testFile.txt'), "_testFile.txt")
+          .end((err, res) => {
+            res.status.should.equal(201);
+            res.text.should.equal("f9bad423122e6f2c1a4b9b44bf4291d7b54a0726b66aacc32538c13707ac34c6");
           });
       });
     });
