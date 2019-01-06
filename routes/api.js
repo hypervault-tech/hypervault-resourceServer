@@ -102,7 +102,7 @@ async function downloadHandler(req, res) {
     const resource = await wrapper.getResource(resourceId);
     if (resource === null) return res.status(404).send();
     if (resource.status !== "AVAILABLE") return res.status(404).send();
-    var filename = "anonymousFile";
+    var filename = "anonymousFile.hypervault";
     if(resource.hasOwnProperty("filename")) filename = resource.filename;
     
 
