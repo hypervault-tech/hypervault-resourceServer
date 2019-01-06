@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Download file using the signature</h1>
+<pre style="white-space: normal;">
+1301da3d5027a0cdef654a02f8349b2344563e619d799fc9dac9c22f450a4800791424101c95e6a5f0aa48210c23509d6e47c5a7e9faf7cc21348c4c9153ebe4be62b586bfa91199f76e19492d10a1ca13ee9cf15b2f79a6a63ed3cb4a8eb4474b0d3ec11accda6e07f4ac01d15e86ff5c90e29047e03465985c2f1d229c9e4bdd0b1b620cf573a448db2226071be58ec43662ae00d3f0f3caee166def773d62c136a89aa2a3f90f30167366039ec3b69eaa91aac84738a2f144c49207261141d080e7e0f666ea27daf0faf969bfc7fa4b1d3d94a3c14200ef4a8a709fd85bdba50640d967622581573cf285e8ea069c5f5392e767368d8c8e8571d1d128f24f
+</pre>
+
+<h1>For request with transactionId</h1>
+<pre>3cb701d51dc94495dbdb25c614232757e8964dd9164457be830fc80f2dbebb75</pre>
+
+<button onclick="download()">Attempt to Download</button>
+</body>
+</html>
+
+<script   src="https://code.jquery.com/jquery-3.3.1.min.js"   integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="   crossorigin="anonymous"></script>
+<script>
+function download(){
+  const hypervaultAPIurl = "http://localhost:8081/api/";
+  const signature = "1301da3d5027a0cdef654a02f8349b2344563e619d799fc9dac9c22f450a4800791424101c95e6a5f0aa48210c23509d6e47c5a7e9faf7cc21348c4c9153ebe4be62b586bfa91199f76e19492d10a1ca13ee9cf15b2f79a6a63ed3cb4a8eb4474b0d3ec11accda6e07f4ac01d15e86ff5c90e29047e03465985c2f1d229c9e4bdd0b1b620cf573a448db2226071be58ec43662ae00d3f0f3caee166def773d62c136a89aa2a3f90f30167366039ec3b69eaa91aac84738a2f144c49207261141d080e7e0f666ea27daf0faf969bfc7fa4b1d3d94a3c14200ef4a8a709fd85bdba50640d967622581573cf285e8ea069c5f5392e767368d8c8e8571d1d128f24f";
+  const transactionId = "3cb701d51dc94495dbdb25c614232757e8964dd9164457be830fc80f2dbebb75";
+  window.location = hypervaultAPIurl + `download/${transactionId}/${signature}`;
+}
+  
+</script>
