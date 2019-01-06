@@ -23,18 +23,17 @@ async function updateResource(resourceId) {
 }
 
 /**
- * ONLY for testing purposes. NOT TO BE USED IN API SERVER
- * @param {String} resourceId 
- * @param {String} resourceStatus - one of the valid status types
+ * This async function submits a PUT request to the API and updates the status of the request with `transactionId` to "FULFILLED"
+ * @param {String} transactionId 
  */
-async function putResource(resourceId, resourceStatus) {
+async function updateRequest(transactionId) {
   try {
-    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId);
-    const resource = JSON.parse(resString); 
-    resource.status = resourceStatus;
-    await request.put(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId, {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Request/" + transactionId);
+    const pReq = JSON.parse(resString); 
+    pReq.status = "FULFILLED";
+    await request.put(hypervaultAPIurl + "tech.hypervault.Request/" + transactionId, {
       json: true,
-      body: resource
+      body: pReq
     });
   } catch(e) {
     throw e;
@@ -67,8 +66,25 @@ async function getResource(resourceId) {
 }
 
 /**
+ * Get the request with some transactionId. Returns `null` if none is found, but throws an error if an error occurs. 
+ * @param {String} transactionId 
+ */
+async function getRequest(transactionId) {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Request/" + transactionId);
+    return JSON.parse(resString);
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return null;
+    } else {
+      throw e;
+    }
+  }
+}
+
+/**
  * This async function queries the ledger to see if the request asset exists and if it does, it check if the status if "PENDING". 
- * If the request is valid, this function returns true, otherwise it will return false. If an error has occurred, an exception will be raised. 
+ * If the request is valid, this function returns true, otherwise it will return false. If an error has occurred, an exception will be raised. If no request is found, it returns null. 
  * @param {String} requestTransactionId - the transactionId (the identifier) of the Request asset
  */
 async function verifyPendingRequest(requestTransactionId) {
@@ -81,7 +97,11 @@ async function verifyPendingRequest(requestTransactionId) {
       return false;
     }
   } catch(e) {
-    throw e;
+    if (e.statusCode === 404) {
+      return null;
+    } else {
+      throw e;
+    }
   }
 }
 
@@ -102,6 +122,23 @@ async function getResourceOwner(resourceId) {
     }
   }catch(e) {
     throw e;
+  }
+}
+
+/**
+ * Get the User with some userId. Returns `null` if none is found, but throws an error if an error occurs. 
+ * @param {String} userId 
+ */
+async function getUser(userId) {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.User/" + userId);
+    return JSON.parse(resString);
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return null;
+    } else {
+      throw e;
+    }
   }
 }
 
@@ -142,6 +179,50 @@ const util = {
 }
 
 
+///////////////////////////////////////////////////////////////////////////
+// Dev only functions
+///////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * ONLY for testing purposes. NOT TO BE USED IN API SERVER
+ * @param {String} resourceId 
+ * @param {String} resourceStatus - one of the valid status types
+ */
+async function putResource(resourceId, resourceStatus) {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId);
+    const resource = JSON.parse(resString); 
+    resource.status = resourceStatus;
+    await request.put(hypervaultAPIurl + "tech.hypervault.Resource/" + resourceId, {
+      json: true,
+      body: resource
+    });
+  } catch(e) {
+    throw e;
+  }
+}
+
+async function putRequest(transactionId, requestStatus) {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.Request/" + transactionId);
+    const pRequest = JSON.parse(resString); 
+    pRequest.status = requestStatus;
+    await request.put(hypervaultAPIurl + "tech.hypervault.Request/" + transactionId, {
+      json: true,
+      body: pRequest
+    });
+  } catch(e) {
+    throw e;
+  }
+}
+
+const devOnly = {
+  putResource: putResource,
+  putRequest:putRequest,
+};
+
+
 // export the methods
 module.exports = {
   updateResource: updateResource,
@@ -151,12 +232,13 @@ module.exports = {
   verifyPendingRequest: verifyPendingRequest,
   getResourceOwner:getResourceOwner,
   pingNetwork: pingNetwork,
+  getRequest: getRequest,
+  getUser: getUser,
+  updateRequest:updateRequest,
 
   // utility functions
   util: util,
 
   // dev only dunctions
-  devOnly: {
-    putResource: putResource
-  }
+  devOnly: devOnly
 }

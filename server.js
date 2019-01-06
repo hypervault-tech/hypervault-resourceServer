@@ -3,6 +3,9 @@ const app = express();
 const port = 8081;
 const mkdirp = require('mkdirp');
 
+const bodyParser = require('body-parser');
+const cors = require('cors');
+
 // first attempt to make ./resources/ directory to store all the files
 try {
   mkdirp.sync("./resources");
@@ -12,6 +15,13 @@ try {
 }
 
 const apiRouter = require("./routes/api");
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cors());
+
+// parse application/json
+app.use(bodyParser.json())
 
 app.use("/api", apiRouter);
 

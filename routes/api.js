@@ -3,12 +3,14 @@ const router = express.Router();
 const wrapper = require("../controllers/wrapper");
 const apiConfig = require("../config");
 const fileUtil = require("../controllers/fileUtils");
+const cryptoUtil = require("../controllers/cryptoUtils");
 
 const multer  = require('multer');
 const upload = multer({ dest: apiConfig.tempResourcesPath });
 
 // to handle files
 const fs = require("fs");
+const path = require("path");
 const util = require('util');
 const copyFile = util.promisify(fs.copyFile);
 const unlink = util.promisify(fs.unlink);
@@ -22,6 +24,8 @@ router.get('/', async function (req, res) {
 });
 
 router.post('/upload/:resourceId', upload.single('resource'), uploadHandler);
+
+router.get('/download/:transactionId/:signature', downloadHandler);
 
 module.exports = router;
 
@@ -75,4 +79,42 @@ async function uploadHandler(req, res) {
     console.error(e);
     return res.status(500).send("Something went wrong. Please try again later.");
   }
+}
+
+async function downloadHandler(req, res) {
+  const transactionId = req.params.transactionId;
+  try {
+    // First of all verify if the request is PENDING
+    const requestVerification = await wrapper.verifyPendingRequest(transactionId);
+    if (requestVerification === null) {
+      return res.status(404).send();
+    }
+    if (requestVerification !== true) {
+      return res.status(400).send();
+    }
+
+    const pRequest = await wrapper.getRequest(transactionId);
+    const resourceId = wrapper.util.getIdentifier(pRequest.resource);
+    const userId = wrapper.util.getIdentifier(pRequest.user);
+    const user = await wrapper.getUser(userId);
+
+    // Next check if the resource is AVAILABLE
+    const resource = await wrapper.getResource(resourceId);
+    if (resource === null) return res.status(404).send();
+    if (resource.status !== "AVAILABLE") return res.status(404).send();
+    var filename = "anonymousFile";
+    if(resource.hasOwnProperty("filename")) filename = resource.filename;
+    
+
+    // Next check if the cryptographic signature is valid
+    const cryptoVerification = cryptoUtil.verifySignature(transactionId, user.pubKey, req.params.signature);
+    if (cryptoVerification === true) {
+      // first of all update Request 
+      await wrapper.updateRequest(transactionId);
+      return res.status(202).download(path.join(__dirname,"../", apiConfig.resourcesPath, resourceId), filename);
+    }
+  } catch(e) {
+    throw e;
+  }
+  
 }
