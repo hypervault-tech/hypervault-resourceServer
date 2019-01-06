@@ -85,7 +85,7 @@ describe("Hypervault Resource Server", ()=> {
   });
 
   describe("# cryptoUtils", ()=> {
-    const signature = "2c2aa454b00a7ab5fbc70e909facb5a5ec3e4274a0df01f3529de80ece64a30a5c50e6fbd65b4a8367eb1b216494cdebc7f3462fff80dbb12f45a214f8cd57127316668278e83df3044af37fac57f236cb818c3f906f528f78404992a28412c4b7f02840abdc5d871e5bddb7c1540063b4504d146bfbb4d62b31c7c62f35b4bd2dd16c604b7b475cdd1bcce64a497968b3ccf968d3f86e448bc298626a6310718adb37b3a2883e7c6052adcd993809b8cce6e4e45bc7f014e92ffc3dafca71308a6fb98b47ce3d5c95da2cb2aadcd5f38bf75e63817022179afc84b12af08e0a6c20609069cd917bc365db4795a08ff89b8b63cc63b6c9b5ef2512483c0d8d9d";
+    const signature = "30440220730e35a73040fe27412a951c5ffe9d5a430c4c8a2ced97b98737b1a219786b8f0220255ee1f808cebe55cb063bda43973143c2a768350bece2e5dbe360fd4a3f6ba1";
     it("should verify the signature correctly for user1.pub", () => {  
       const pubKey = fs.readFileSync("./test/user1.pub");
       expect(cryptoUtil.verifySignature("test", pubKey, signature) ).to.equal(true);
@@ -159,7 +159,7 @@ describe("Hypervault Resource Server", ()=> {
       });
 
       it("should return 202 for a request with correct signature and the request becomes FULFILLED, subsequent request will be rejected with 400", async () => {  
-        const signature = "1301da3d5027a0cdef654a02f8349b2344563e619d799fc9dac9c22f450a4800791424101c95e6a5f0aa48210c23509d6e47c5a7e9faf7cc21348c4c9153ebe4be62b586bfa91199f76e19492d10a1ca13ee9cf15b2f79a6a63ed3cb4a8eb4474b0d3ec11accda6e07f4ac01d15e86ff5c90e29047e03465985c2f1d229c9e4bdd0b1b620cf573a448db2226071be58ec43662ae00d3f0f3caee166def773d62c136a89aa2a3f90f30167366039ec3b69eaa91aac84738a2f144c49207261141d080e7e0f666ea27daf0faf969bfc7fa4b1d3d94a3c14200ef4a8a709fd85bdba50640d967622581573cf285e8ea069c5f5392e767368d8c8e8571d1d128f24f";
+        const signature = "30450221009d3ad15114f03382edfa0f3050f53fd609e400b0b10469d41b96e8682598b7f7022019178f7a3e570f91819e4da145c65657e30909a34491e97f59caa91735a768ba";
         const transactionId = "3cb701d51dc94495dbdb25c614232757e8964dd9164457be830fc80f2dbebb75";
         
         const res = await chai.request(server).get(`/api/download/${transactionId}/${signature}`);
