@@ -1,7 +1,6 @@
 const request = require("request-promise");
-// const hypervaultAPIurl = "http://resourceserver.hypervault.tech:3000/api/";
-// const hypervaultAPIurl = "http://hypervault.tech:3000/api/";
-const hypervaultAPIurl = "http://localhost:3000/api/";
+const APIconfig = require("../config");
+const hypervaultAPIurl = APIconfig.composerAPIurl;
 
 
 /**
