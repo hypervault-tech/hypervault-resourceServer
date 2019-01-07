@@ -1,5 +1,33 @@
 # Hypervault resource server
 
+## Bringing up the resource server
+
+Simply run ` npm start `. But please check that everthing is up and running by running the following commands after a few seconds: 
+
+```
+docker logs hypervaultrest
+```
+
+which should hopefully show something like
+
+```
+...
+Web server listening at: http://localhost:3000
+Browse your REST API at http://localhost:3000/explorer
+```
+
+and also run 
+
+```
+forever list | grep resourceServer
+```
+
+which should hopefully show an instance that is up and running like this 
+
+```
+data:    [0] resourceServer /home/ubuntu/.nvm/versions/node/v8.15.0/bin/node server.js 1768    1774    /home/ubuntu/.forever/resourceServer.log 0:0:0:21.928
+```
+
 ## Setting up an Ubuntu server
 
 Download and install prerequisites by running as NON-ROOT
