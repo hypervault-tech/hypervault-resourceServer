@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon --ext js,njk server.js --dev",
-    "test": "mocha -t 0 --recursive --exit"
+    "test": "mocha -t 0 --recursive --exit",
+    "start": "./start.sh"
   },
   "repository": {
     "type": "git",
