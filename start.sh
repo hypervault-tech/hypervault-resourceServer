@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
 echo "Building and running hypervault-rest-server"
-source ./composer-rest-server/start.sh 
+cd ./composer-rest-server
+source ./start.sh 
 
+cd ../
 echo "Restarting resource server"
 forever stop resourceServer
 forever start --append --uid "resourceServer" server.js
