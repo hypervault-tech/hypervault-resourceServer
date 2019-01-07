@@ -16,7 +16,6 @@ docker run \
 -e COMPOSER_MULTIUSER=${COMPOSER_MULTIUSER} \
 -v ~/.composer:/home/composer/.composer \
 --name hypervaultrest \
---network composer_default \
 -p 3000:3000 \
 hypervault/rest-server
 
