@@ -14,9 +14,9 @@ source ./start.sh
 cd ../
 echo "Restarting resource server"
 set +e 
-forever stop resourceServer 
+pm2 stop resourceServer 
 set -e 
-forever start --append --uid "resourceServer" server.js
+pm2 start server.js --name="resourceServer" 
 
-echo "Check server log by running: "
-echo "forever list | grep resourceServer"
+echo "Check server status by running: "
+echo "pm2 list"
