@@ -13,7 +13,9 @@ source ./start.sh
 
 cd ../
 echo "Restarting resource server"
-forever stop resourceServer
+set +e 
+forever stop resourceServer 
+set -e 
 forever start --append --uid "resourceServer" server.js
 
 echo "Check server log by running: "
