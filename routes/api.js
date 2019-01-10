@@ -25,8 +25,8 @@ router.get('/', async function (req, res) {
 
 router.post('/upload/:resourceId', upload.single('resource'), uploadHandler);
 
-router.get('/download/:transactionId/:signature', downloadHandler);
 router.head('/download/:transactionId/:signature', headDownloadHandler);
+router.get('/download/:transactionId/:signature', downloadHandler);
 
 module.exports = router;
 
@@ -121,7 +121,7 @@ async function downloadHandler(req, res) {
 }
 
 
-async function downloadHandler(req, res) {
+async function headDownloadHandler(req, res) {
   const transactionId = req.params.transactionId;
   try {
     // First of all verify if the request is PENDING
