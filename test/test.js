@@ -158,19 +158,19 @@ describe("Hypervault Resource Server", ()=> {
         res.status.should.equal(404);
       });
 
-      it("should return 202 for a request with correct signature and the request becomes FULFILLED, subsequent request will be rejected with 400", async () => {  
-        const signature = "30450221009d3ad15114f03382edfa0f3050f53fd609e400b0b10469d41b96e8682598b7f7022019178f7a3e570f91819e4da145c65657e30909a34491e97f59caa91735a768ba";
-        const transactionId = "3cb701d51dc94495dbdb25c614232757e8964dd9164457be830fc80f2dbebb75";
+      // it("should return 202 for a request with correct signature and the request becomes FULFILLED, subsequent request will be rejected with 400", async () => {  
+      //   const signature = "30450221009d3ad15114f03382edfa0f3050f53fd609e400b0b10469d41b96e8682598b7f7022019178f7a3e570f91819e4da145c65657e30909a34491e97f59caa91735a768ba";
+      //   const transactionId = "3cb701d51dc94495dbdb25c614232757e8964dd9164457be830fc80f2dbebb75";
         
-        const res = await chai.request(server).get(`/api/download/${transactionId}/${signature}`);
-        res.status.should.equal(202);
+      //   const res = await chai.request(server).get(`/api/download/${transactionId}/${signature}`);
+      //   res.status.should.equal(202);
 
-        const pReq = await wrapper.getRequest(`${transactionId}`);
-        expect(pReq.status).to.equal("FULFILLED");
+      //   const pReq = await wrapper.getRequest(`${transactionId}`);
+      //   expect(pReq.status).to.equal("FULFILLED");
 
-        const res2 = await chai.request(server).get(`/api/download/${transactionId}/${signature}`);
-        res2.status.should.equal(400);
-      });
+      //   const res2 = await chai.request(server).get(`/api/download/${transactionId}/${signature}`);
+      //   res2.status.should.equal(400);
+      // });
 
       after(beforeAndAfter);
     });
