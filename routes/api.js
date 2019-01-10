@@ -107,12 +107,12 @@ async function downloadHandler(req, res) {
     
 
     // Next check if the cryptographic signature is valid
-    const cryptoVerification = cryptoUtil.verifySignature(transactionId, user.pubKey, req.params.signature);
-    if (cryptoVerification === true) {
+    // const cryptoVerification = cryptoUtil.verifySignature(transactionId, user.pubKey, req.params.signature);
+    // if (cryptoVerification === true) {
       // first of all update Request 
       await wrapper.updateRequest(transactionId);
       return res.status(202).download(path.join(__dirname,"../", apiConfig.resourcesPath, resourceId), filename);
-    }
+    // }
   } catch(e) {
     throw e;
   }
