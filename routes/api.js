@@ -26,6 +26,7 @@ router.get('/', async function (req, res) {
 router.post('/upload/:resourceId', upload.single('resource'), uploadHandler);
 
 router.get('/download/:transactionId/:signature', downloadHandler);
+router.head('/download/:transactionId/:signature', headDownloadHandler);
 
 module.exports = router;
 
@@ -112,6 +113,40 @@ async function downloadHandler(req, res) {
       // first of all update Request 
       await wrapper.updateRequest(transactionId);
       return res.status(202).download(path.join(__dirname,"../", apiConfig.resourcesPath, resourceId), filename);
+    // }
+  } catch(e) {
+    throw e;
+  }
+  
+}
+
+
+async function downloadHandler(req, res) {
+  const transactionId = req.params.transactionId;
+  try {
+    // First of all verify if the request is PENDING
+    const requestVerification = await wrapper.verifyPendingRequest(transactionId);
+    if (requestVerification === null) {
+      return res.status(404).send();
+    }
+    if (requestVerification !== true) {
+      return res.status(400).send();
+    }
+
+    const pRequest = await wrapper.getRequest(transactionId);
+    const resourceId = wrapper.util.getIdentifier(pRequest.resource);
+    const userId = wrapper.util.getIdentifier(pRequest.user);
+    const user = await wrapper.getUser(userId);
+
+    // Next check if the resource is AVAILABLE
+    const resource = await wrapper.getResource(resourceId);
+    if (resource === null) return res.status(404).send();
+    if (resource.status !== "AVAILABLE") return res.status(404).send();
+
+    // Next check if the cryptographic signature is valid
+    // const cryptoVerification = cryptoUtil.verifySignature(transactionId, user.pubKey, req.params.signature);
+    // if (cryptoVerification === true) {
+      return res.status(202).send();
     // }
   } catch(e) {
     throw e;
