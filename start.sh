@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 echo "Getting latest business network card from hypervault-id repository"
-rm resourceServer1.card
+rm resourceServer.card
 composer card delete -c resourceServer1@hypervault
-wget https://github.com/lixiii/hypervault-id/raw/master/cards/resourceServer1.card
-composer card import -f resourceServer1.card
-rm resourceServer1.card
+wget https://github.com/lixiii/hypervault-id/raw/master/cards/resourceServer.card
+composer card import -f resourceServer.card
+rm resourceServer.card
 
 echo "Building and running hypervault-rest-server"
 cd ./composer-rest-server
