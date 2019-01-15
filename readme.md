@@ -56,22 +56,22 @@ npm install -g composer-rest-server
 npm install -g composer-playground
 ```
 
-Next import the identity card `resourceServer1.card` by running 
+Next import the identity card `resourceServer.card` by running 
 
 ```
-composer card import -f resourceServer1.card
+composer card import -f resourceServer.card
 ```
 
 Now test if the connection is successful by 
 
 ```
-composer network ping --card resourceServer1@hypervault
+composer network ping --card resourceServer@hypervault
 ```
 
 Finally start the REST server by 
 
 ```
-composer-rest-server -c resourceServer1@hypervault
+composer-rest-server -c resourceServer@hypervault
 ```
 
 ## Troubleshooting
