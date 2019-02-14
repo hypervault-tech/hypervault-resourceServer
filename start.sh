@@ -18,3 +18,11 @@ pm2 start server.js --name="resourceServer"
 
 echo "Check server status by running: "
 echo "pm2 list"
+
+# Update reverse proxy
+echo 
+echo '---------------------------------------'
+echo "Updating reverse proxy"
+echo '---------------------------------------'
+sudo cp ./resourceserver.hypervault.tech.conf /etc/nginx/conf.d/resourceserver.hypervault.tech.conf
+sudo systemctl restart nginx
