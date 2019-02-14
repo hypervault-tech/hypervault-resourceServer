@@ -6,7 +6,7 @@ const fileUtil = require("../controllers/fileUtils");
 const cryptoUtil = require("../controllers/cryptoUtils");
 
 const multer  = require('multer');
-const upload = multer({ dest: apiConfig.tempResourcesPath });
+const upload = multer({ dest: apiConfig.tempResourcesPath, limits: { fileSize: apiConfig.maxSize } });
 
 // to handle files
 const fs = require("fs");

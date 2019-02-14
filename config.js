@@ -8,7 +8,9 @@ const config = {
   // path to save all resources
   resourcesPath: "./resources",
   // path to hold temporary uploads
-  tempResourcesPath: "./temp"
+  tempResourcesPath: "./temp",
+
+  maxSize: 10 * 1024 * 1024
 }
 
 
