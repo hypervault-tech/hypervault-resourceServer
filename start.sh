@@ -24,5 +24,5 @@ echo
 echo '---------------------------------------'
 echo "Updating reverse proxy"
 echo '---------------------------------------'
-sudo cp ./resourceserver.hypervault.tech.conf /etc/nginx/conf.d/resourceserver.hypervault.tech.conf
+sudo cp ./resourceserver2.hypervault.tech.conf /etc/nginx/conf.d/resourceserver2.hypervault.tech.conf
 sudo systemctl restart nginx
