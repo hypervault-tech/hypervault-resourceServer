@@ -112,7 +112,7 @@ async function downloadHandler(req, res) {
     // if (cryptoVerification === true) {
       // first of all update Request 
       await wrapper.updateRequest(transactionId);
-      return res.status(202).download(path.join(__dirname,"../", apiConfig.resourcesPath, resourceId), filename);
+      return res.status(200).download(path.join(__dirname,"../", apiConfig.resourcesPath, resourceId), filename);
     // }
   } catch(e) {
     throw e;
