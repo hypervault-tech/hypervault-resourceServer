@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon --ext js,njk server.js --dev",
     "test": "mocha -t 0 --recursive --exit",
+    "deploy": "git checkout master; git push; ssh ubuntu@resourceserver.hypervault.tech \"bash -s\" -- <./_scripts/deploy.sh",
     "start": "./start.sh"
   },
   "repository": {
