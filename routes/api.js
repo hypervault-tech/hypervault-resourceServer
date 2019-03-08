@@ -14,6 +14,8 @@ const path = require("path");
 const util = require('util');
 const copyFile = util.promisify(fs.copyFile);
 const unlink = util.promisify(fs.unlink);
+// const spawn = util.promisify(require('child_process').spawnSync);
+const spawn = require('child_process').spawnSync;
 
 router.get('/', async function (req, res) {
   pingResponse = await wrapper.pingNetwork();
@@ -24,6 +26,7 @@ router.get('/', async function (req, res) {
 });
 
 router.post('/upload/:resourceId', upload.single('resource'), uploadHandler);
+router.post('/secureUpload/:resourceId', upload.single('resource'), secureUploadHandler);
 
 router.head('/download/:transactionId/:signature', headDownloadHandler);
 router.get('/download/:transactionId/:signature', downloadHandler);
@@ -152,4 +155,73 @@ async function headDownloadHandler(req, res) {
     throw e;
   }
   
+}
+
+/**
+ * The params need to have a resource: the file uploaded
+ * AS WELL AS a `keys` field which is a json object containing all the keys of the user. 
+ */
+async function secureUploadHandler(req, res) {
+  // file is saved to ./temp
+  const resourceId = req.params.resourceId;
+  try {
+    // first check if a file has been uploaded
+    if (req.hasOwnProperty("file") == false)  {
+      return res.status(400).send("One and only one attached file is required. ");
+    }
+
+    const resource = await wrapper.getResource(resourceId);
+    // next check if the resource exists
+    if(resource == null) {
+      await unlink(req.file.path);
+      return res.status(404).send("No resource is found with the given resourceId.");
+    }
+    // next check status of resource
+    if(resource.status !== "PENDING_TRANSFER") {
+      await unlink(req.file.path);
+      return res.status(400).send(`Resource status needs to be "PENDING_TRANSFER" for the resource to be accepted. `)
+    } 
+    // proceed to check if owner exists
+    var user = {};
+    try {
+      user = await wrapper.getResourceOwner(resourceId);
+    } catch(e) {
+      await unlink(req.file.path);
+      return res.status(400).send(`Something is wrong with the owner of the resource as the database gives an error when trying to read the user details.`);
+    }
+
+    // Finally check hash of the file
+    const filehash = fileUtil.hashFile( req.file.path );
+    if(filehash !== resource.resourceId) {
+      await unlink(req.file.path);
+      return res.status(400).send("The filehash does not match the resourceId. ");
+    } 
+
+    // now all checks are completed. Proceed to save and encrypt the file and make it available. 
+    await copyFile(req.file.path, `${apiConfig.resourcesPath}/${resource.resourceId}`);
+    await unlink(req.file.path);
+
+    // NuCypher encryption for all current users (for now. TODO: ask for list of users)
+
+    // first encrypt with the owner's public key
+    var ownerKeys = JSON.parse(req.body.keys);
+    var pythonProcess = spawn( "python3", [ "./pythonScripts/encrypt.py", ownerKeys.publicKey, resource.resourceId ] );
+    console.log(pythonProcess.output.toString());
+
+    var pubKeys = await wrapper.getAllPublicKeys();
+    pubKeys.forEach((pubKey) => {
+      spawn( "python3", [ "./pythonScripts/generateKfrags.py", ownerKeys.privateKey, ownerKeys.signingKey, pubKey, resource.resourceId, 1, 1 ] );
+    });
+
+    // now delete the unencrypted file
+    await unlink(`${apiConfig.resourcesPath}/${resource.resourceId}`);
+
+    // now return successful response 
+    await wrapper.updateResource(resource.resourceId); 
+    return res.status(201).send(resource.resourceId);
+
+  }catch(e) {
+    console.error(e);
+    return res.status(500).send("Something went wrong. Please try again later.");
+  }
 }
