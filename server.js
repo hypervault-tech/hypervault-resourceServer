@@ -11,6 +11,7 @@ try {
   mkdirp.sync("./resources");
   mkdirp.sync("./resources/capsules");
   mkdirp.sync("./resources/ciphertexts");
+  mkdirp.sync("./resources/kfrags");
   mkdirp.sync("./temp");  // place to temporarily hold all uploads: if the uploaded file has a hash matching that declared in the blockchain, it will be copied t the resources folder
 } catch (e) {
   throw e;
