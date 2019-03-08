@@ -165,7 +165,8 @@ async function getAllPublicKeys() {
     const users = await getAllUsers();
     var pubKeys = [];
     users.forEach(user => {
-      pubKeys.push(user.pubKey);
+      pubKeyObj = JSON.parse(user.pubKey);
+      pubKeys.push(pubKeyObj.publicKey);
     });
     return pubKeys;
   } catch (e) {
