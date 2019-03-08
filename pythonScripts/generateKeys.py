@@ -21,5 +21,10 @@ output = {  "privateKey": private_key.to_bytes().hex(),
             "signingKey": signing_key.to_bytes().hex(),
             "verifyingKey": verifying_key.to_bytes().hex()}
 
-with open("./keys/" + sys.argv[1] + ".keys", "w") as output_file:
+pubkeys = { "publicKey": public_key.to_bytes().hex(),
+            "verifyingKey": verifying_key.to_bytes().hex()}
+
+with open("./keys/" + sys.argv[1] + ".keys", "w") as output_file, \
+        open("./keys/" + sys.argv[1] + ".pubkeys", "w") as pubkeys_file:
     json.dump(output, output_file)
+    json.dump(pubkeys, pubkeys_file)
