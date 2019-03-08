@@ -29,7 +29,7 @@ router.post('/upload/:resourceId', upload.single('resource'), uploadHandler);
 router.post('/secureUpload/:resourceId', upload.single('resource'), secureUploadHandler);
 
 router.head('/download/:transactionId/:signature', headDownloadHandler);
-router.get('/download/:transactionId/:signature/:keys', downloadHandler);
+router.get('/download/:transactionId/:signature', downloadHandler);
 
 module.exports = router;
 
