@@ -27,10 +27,10 @@ kfrags_filepath = "./resources/kfrags/" + filename + "--" + receiving_public_key
 threshhold = int( sys.argv[5])
 N = int( sys.argv[6])
 
-kfrags = pre.generate_kfrags(delegating_privkey=private_key,         \
-                             signer=signer,                          \
-                             receiving_pubkey=receiving_public_key,              \
-                             threshold=1,                          \
+kfrags = pre.generate_kfrags(delegating_privkey=private_key,            \
+                             signer=signer,                             \
+                             receiving_pubkey=receiving_public_key,     \
+                             threshold=1,                               \
                              N=1)
 
 with open(kfrags_filepath, "wb") as kfrag_file:
