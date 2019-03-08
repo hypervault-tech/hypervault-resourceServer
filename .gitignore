@@ -5,6 +5,10 @@ temp/
 # python3 
 venv/
 
+# credentials
+credentials/
+*.keys
+
 # Logs
 logs
 *.log

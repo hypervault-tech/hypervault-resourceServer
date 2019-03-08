@@ -1,6 +1,6 @@
 # Arguments
 # output_filename
-# This automatically appends the extension ".keys"
+# This automatically saves the file to ./keys/ directory
 
 from umbral import config
 from umbral.curve import SECP256K1
@@ -21,5 +21,5 @@ output = {  "privateKey": private_key.to_bytes().hex(),
             "signingKey": signing_key.to_bytes().hex(),
             "verifyingKey": verifying_key.to_bytes().hex()}
 
-with open("./" + sys.argv[1] + ".keys", "w") as output_file:
+with open("./keys/" + sys.argv[1] + ".keys", "w") as output_file:
     json.dump(output, output_file)
