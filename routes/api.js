@@ -29,7 +29,7 @@ router.post('/upload/:resourceId', upload.single('resource'), uploadHandler);
 router.post('/secureUpload/:resourceId', upload.single('resource'), secureUploadHandler);
 
 router.head('/download/:transactionId/:signature', headDownloadHandler);
-router.get('/download/:transactionId/:signature', downloadHandler);
+router.get('/download/:transactionId/:signature/:keys', downloadHandler);
 
 module.exports = router;
 
@@ -109,14 +109,35 @@ async function downloadHandler(req, res) {
     var filename = "anonymousFile.hypervault";
     if(resource.hasOwnProperty("filename")) filename = resource.filename;
     
-
-    // Next check if the cryptographic signature is valid
-    // const cryptoVerification = cryptoUtil.verifySignature(transactionId, user.pubKey, req.params.signature);
-    // if (cryptoVerification === true) {
+    // check if file is encrypted 
+    if( fs.existsSync( path.join(__dirname,"../", apiConfig.resourcesPath, resourceId) ) ) {
+      // the file is not encrypted
       // first of all update Request 
       await wrapper.updateRequest(transactionId);
       return res.status(200).download(path.join(__dirname,"../", apiConfig.resourcesPath, resourceId), filename);
-    // }
+    } else {
+      // file is encrypted need to reencrypt using NyCypher
+      var keys = JSON.parse(req.params.keys);
+      var ownerId = await wrapper.util.getIdentifier(resource.owner);
+      var owner = await wrapper.getUser(ownerId);
+      var ownerPubKeys = JSON.parse(owner.pubKey);
+      var NuCypher = spawn( "python3", [ path.join(__dirname,"../pythonScripts/reencryptDecrypt.py"), ownerPubKeys.publicKey, keys.privateKey, ownerPubKeys.verifyingKey, resource.resourceId ] );
+      if(NuCypher.stderr.toString()) {
+        throw Error(NuCypher.stderr.toString());
+      }
+      //check if the decrypted file exists
+      if( fs.existsSync( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") ) ) {
+        // first of all update Request 
+        await wrapper.updateRequest(transactionId);
+        res.status(200).download( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted"), filename);
+        // finally remove the file
+        await unlink( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") );
+      }
+
+    }
+
+    
+
   } catch(e) {
     throw e;
   }
@@ -205,12 +226,17 @@ async function secureUploadHandler(req, res) {
 
     // first encrypt with the owner's public key
     var ownerKeys = JSON.parse(req.body.keys);
-    var pythonProcess = spawn( "python3", [ "./pythonScripts/encrypt.py", ownerKeys.publicKey, resource.resourceId ] );
-    console.log(pythonProcess.output.toString());
+    var NuCypher = spawn( "python3", [ path.join(__dirname,"../pythonScripts/encrypt.py"), ownerKeys.publicKey, resource.resourceId ] );
+    if(NuCypher.stderr.toString()) {
+      throw Error(NuCypher.stderr.toString());
+    }
 
     var pubKeys = await wrapper.getAllPublicKeys();
     pubKeys.forEach((pubKey) => {
-      spawn( "python3", [ "./pythonScripts/generateKfrags.py", ownerKeys.privateKey, ownerKeys.signingKey, pubKey, resource.resourceId, 1, 1 ] );
+      spawn( "python3", [ path.join(__dirname,"../pythonScripts/generateKfrags.py"), ownerKeys.privateKey, ownerKeys.signingKey, pubKey, resource.resourceId, 1, 1 ] );
+      if(NuCypher.stderr.toString()) {
+        throw Error(NuCypher.stderr.toString());
+      }
     });
 
     // now delete the unencrypted file
