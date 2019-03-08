@@ -125,6 +125,7 @@ async function downloadHandler(req, res) {
       if(NuCypher.stderr.toString()) {
         throw Error(NuCypher.stderr.toString());
       }
+      console.log(NuCypher.output.toString());
       //check if the decrypted file exists
       if( fs.existsSync( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") ) ) {
         // first of all update Request 
