@@ -23,10 +23,10 @@ filepath = "./resources/" + filename
 capsules_filepath = "./resources/capsules/" + filename
 ciphertexts_filepath = "./resources/ciphertexts/" + filename
 kfrags_filepath = "./resources/kfrags/" + filename + "--" + receiving_public_key.to_bytes().hex()
-
+temp_filepath = "./temp/decrypted"
 
 with open(capsules_filepath, "rb") as capsule_file, open(ciphertexts_filepath, "rb") as ciphertext_file,  \
-        open(kfrags_filepath, "rb") as kfrag_file:
+        open(kfrags_filepath, "rb") as kfrag_file, open(temp_filepath, "wb") as temp_file:
 
     capsule = pre.Capsule.from_bytes( capsule_file.read(), receiving_private_key.params )
     ciphertext = ciphertext_file.read()
@@ -42,4 +42,4 @@ with open(capsules_filepath, "rb") as capsule_file, open(ciphertexts_filepath, "
     
     decrypted = pre.decrypt(ciphertext=ciphertext, capsule=capsule, decrypting_key=receiving_private_key)
 
-    print(decrypted)
+    temp_file.write(decrypted)
