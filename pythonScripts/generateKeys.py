@@ -11,4 +11,5 @@ verifying_key = signing_key.get_pubkey()
 signer = signing.Signer(private_key=signing_key)
 
 print(private_key.to_bytes().hex())
+print(public_key.to_bytes().hex())
 print(signing_key.to_bytes().hex())
