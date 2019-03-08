@@ -1,6 +1,6 @@
 # Arguments
-# secret_key signing_key filename
-# Private keys are in HEX string
+# public_key filename
+# Keys are in HEX string
 # filename is *just* the filename and is stored in ./resources/
 
 import sys
@@ -10,14 +10,9 @@ config.set_default_curve(SECP256K1)
 from umbral import keys, signing
 from umbral import pre
 
-private_key = keys.UmbralPrivateKey.from_bytes( bytes.fromhex(sys.argv[1] ) )
-public_key = private_key.get_pubkey()
+public_key = keys.UmbralPublicKey.from_bytes( bytes.fromhex( sys.argv[1] ) )
 
-signing_key = keys.UmbralPrivateKey.from_bytes( bytes.fromhex(sys.argv[2] ))
-verifying_key = signing_key.get_pubkey()
-signer = signing.Signer(private_key=signing_key)
-
-filename = sys.argv[3]
+filename = sys.argv[2]
 filepath = "./resources/" + filename
 capsules_filepath = "./resources/capsules/" + filename
 ciphertexts_filepath = "./resources/ciphertexts/" + filename
