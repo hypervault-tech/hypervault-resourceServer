@@ -125,14 +125,14 @@ async function downloadHandler(req, res) {
       if(NuCypher.stderr.toString()) {
         throw Error(NuCypher.stderr.toString());
       }
-      console.log(NuCypher.output.toString());
       //check if the decrypted file exists
       if( fs.existsSync( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") ) ) {
         // first of all update Request 
         await wrapper.updateRequest(transactionId);
         res.status(200).download( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted"), filename);
         // finally remove the file
-        await unlink( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") );
+        req.on("end", () => fs.unlinkSync( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") ) );
+        return;
       }
 
     }
