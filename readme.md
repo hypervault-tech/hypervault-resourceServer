@@ -1,5 +1,11 @@
 # Hypervault resource server
 
+## Dependencies
+
+- Python3 
+- umbral (install using `pip3 install umbral`)
+- NodeJS V8+
+
 ## Bringing up the resource server
 
 Simply run ` npm start `. But please check that everthing is up and running by running the following commands after a few seconds: 
