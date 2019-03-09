@@ -1,6 +1,6 @@
 {
   "name": "hypervault-resouceserver",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Resource Server in hypervault",
   "main": "server.js",
   "scripts": {

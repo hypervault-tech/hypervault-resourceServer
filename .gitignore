@@ -2,6 +2,14 @@
 resources/
 temp/
 
+# python3 
+venv/
+
+# credentials
+credentials/
+*.keys
+*.pubkeys
+
 # Logs
 logs
 *.log

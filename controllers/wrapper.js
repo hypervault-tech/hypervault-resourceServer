@@ -141,6 +141,43 @@ async function getUser(userId) {
   }
 }
 
+/**
+ * Get all users.
+ */
+async function getAllUsers() {
+  try {
+    const resString = await request.get(hypervaultAPIurl + "tech.hypervault.User/");
+    return JSON.parse(resString);
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return null;
+    } else {
+      throw e;
+    }
+  }
+}
+
+/**
+ * Get all public keys.
+ */
+async function getAllPublicKeys() {
+  try {
+    const users = await getAllUsers();
+    var pubKeys = [];
+    users.forEach(user => {
+      pubKeyObj = JSON.parse(user.pubKey);
+      pubKeys.push(pubKeyObj.publicKey);
+    });
+    return pubKeys;
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return null;
+    } else {
+      throw e;
+    }
+  }
+}
+
 
 /**
  * Example response from the ping request
@@ -234,6 +271,8 @@ module.exports = {
   getRequest: getRequest,
   getUser: getUser,
   updateRequest:updateRequest,
+  getAllUsers:getAllUsers, 
+  getAllPublicKeys:getAllPublicKeys,
 
   // utility functions
   util: util,
