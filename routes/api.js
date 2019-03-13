@@ -117,7 +117,15 @@ async function downloadHandler(req, res) {
       return res.status(200).download(path.join(__dirname,"../", apiConfig.resourcesPath, resourceId), filename);
     } else {
       // file is encrypted need to reencrypt using NyCypher
-      var keys = JSON.parse(req.query.keys);
+
+      // first check that the keys query string is properly formatted
+      var keys;
+      try {
+        keys = JSON.parse(req.query.keys);
+      } catch(e){
+        return res.status(400).send("Bad encryption keys. Please make sure that you have pasted the keys correctly. ");
+      }
+      
       var ownerId = await wrapper.util.getIdentifier(resource.owner);
       var owner = await wrapper.getUser(ownerId);
       var ownerPubKeys = JSON.parse(owner.pubKey);
