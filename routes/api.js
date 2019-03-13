@@ -131,7 +131,7 @@ async function downloadHandler(req, res) {
       var ownerPubKeys = JSON.parse(owner.pubKey);
       var NuCypher = spawn( "python3", [ path.join(__dirname,"../pythonScripts/reencryptDecrypt.py"), ownerPubKeys.publicKey, keys.privateKey, ownerPubKeys.verifyingKey, resource.resourceId ] );
       if(NuCypher.stderr.toString()) {
-        res.status(400).send("The encryption keys provided are invalid. ");
+        res.status(401).send("The encryption keys provided are invalid. ");
         console.error(NuCypher.stderr.toString());
       }
       //check if the decrypted file exists
@@ -181,7 +181,7 @@ async function headDownloadHandler(req, res) {
     // finally check the validity of the keys 
     var validity = await isValidKeys(req.query.keys);
     if ( validity != true) {
-      return res.status(400).send("The encryption keys provided are invalid. ");
+      return res.status(401).send("The encryption keys provided are invalid. ");
     }
     return res.status(202).send();
   } catch(e) {
