@@ -123,7 +123,8 @@ async function downloadHandler(req, res) {
       var ownerPubKeys = JSON.parse(owner.pubKey);
       var NuCypher = spawn( "python3", [ path.join(__dirname,"../pythonScripts/reencryptDecrypt.py"), ownerPubKeys.publicKey, keys.privateKey, ownerPubKeys.verifyingKey, resource.resourceId ] );
       if(NuCypher.stderr.toString()) {
-        throw Error(NuCypher.stderr.toString());
+        res.status(400).send("The encryption keys provided are invalid. ");
+        console.error(NuCypher.stderr.toString());
       }
       //check if the decrypted file exists
       if( fs.existsSync( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") ) ) {
@@ -133,6 +134,8 @@ async function downloadHandler(req, res) {
         // finally remove the file
         req.on("end", () => fs.unlinkSync( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") ) );
         return;
+      } else {
+        res.status(500).send();
       }
 
     }
