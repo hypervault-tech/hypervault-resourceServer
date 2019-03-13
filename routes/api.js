@@ -117,13 +117,22 @@ async function downloadHandler(req, res) {
       return res.status(200).download(path.join(__dirname,"../", apiConfig.resourcesPath, resourceId), filename);
     } else {
       // file is encrypted need to reencrypt using NyCypher
-      var keys = JSON.parse(req.query.keys);
+
+      // first check that the keys query string is properly formatted
+      var keys;
+      try {
+        keys = JSON.parse(req.query.keys);
+      } catch(e){
+        return res.status(400).send("Bad encryption keys. Please make sure that you have pasted the keys correctly. ");
+      }
+
       var ownerId = await wrapper.util.getIdentifier(resource.owner);
       var owner = await wrapper.getUser(ownerId);
       var ownerPubKeys = JSON.parse(owner.pubKey);
       var NuCypher = spawn( "python3", [ path.join(__dirname,"../pythonScripts/reencryptDecrypt.py"), ownerPubKeys.publicKey, keys.privateKey, ownerPubKeys.verifyingKey, resource.resourceId ] );
       if(NuCypher.stderr.toString()) {
-        throw Error(NuCypher.stderr.toString());
+        res.status(401).send("The encryption keys provided are invalid. ");
+        console.error(NuCypher.stderr.toString());
       }
       //check if the decrypted file exists
       if( fs.existsSync( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") ) ) {
@@ -133,6 +142,8 @@ async function downloadHandler(req, res) {
         // finally remove the file
         req.on("end", () => fs.unlinkSync( path.join(__dirname,"../", apiConfig.tempResourcesPath, "decrypted") ) );
         return;
+      } else {
+        res.status(500).send();
       }
 
     }
@@ -152,27 +163,27 @@ async function headDownloadHandler(req, res) {
     // First of all verify if the request is PENDING
     const requestVerification = await wrapper.verifyPendingRequest(transactionId);
     if (requestVerification === null) {
-      return res.status(404).send();
+      return res.status(404).send("Transaction not found");
     }
     if (requestVerification !== true) {
-      return res.status(400).send();
+      return res.status(400).send("Transaction is invalid");
     }
 
     const pRequest = await wrapper.getRequest(transactionId);
     const resourceId = wrapper.util.getIdentifier(pRequest.resource);
     const userId = wrapper.util.getIdentifier(pRequest.user);
-    const user = await wrapper.getUser(userId);
 
     // Next check if the resource is AVAILABLE
     const resource = await wrapper.getResource(resourceId);
     if (resource === null) return res.status(404).send();
     if (resource.status !== "AVAILABLE") return res.status(404).send();
 
-    // Next check if the cryptographic signature is valid
-    // const cryptoVerification = cryptoUtil.verifySignature(transactionId, user.pubKey, req.params.signature);
-    // if (cryptoVerification === true) {
-      return res.status(202).send();
-    // }
+    // finally check the validity of the keys 
+    var validity = await isValidKeys(req.query.keys);
+    if ( validity != true) {
+      return res.status(401).send("The encryption keys provided are invalid. ");
+    }
+    return res.status(202).send();
   } catch(e) {
     throw e;
   }
@@ -250,5 +261,44 @@ async function secureUploadHandler(req, res) {
   }catch(e) {
     console.error(e);
     return res.status(500).send("Something went wrong. Please try again later.");
+  }
+}
+
+
+
+/**
+ * This function checks whether the given set of keys are valid (in the sense that the public keys come from the correct private keys)
+ * @param {String} keys - The JSON string containing the four keys
+ * @param {String} userId 
+ * @returns {True} - If the keys are valid in the sense specified above
+ */
+async function isValidKeys(keys){
+  try {
+    var validity = true;
+    // try to parse the given keys
+    var keysObj;
+    try {
+      keysObj = JSON.parse(keys);
+    } catch (error) {
+      return false;
+    }
+
+    var NuCypher = spawn( "python3", [ path.join(__dirname,"../pythonScripts/getPublicKey.py"), keysObj.privateKey ] );
+    if ( NuCypher.stdout.toString().trim() != keysObj.publicKey) {
+      validity = false;
+    }
+    var NuCypher = spawn( "python3", [ path.join(__dirname,"../pythonScripts/getPublicKey.py"), keysObj.signingKey ] );
+    if ( NuCypher.stdout.toString().trim() != keysObj.verifyingKey) {
+      validity = false;
+    }
+
+    return validity;
+
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return null;
+    } else {
+      throw e;
+    }
   }
 }
