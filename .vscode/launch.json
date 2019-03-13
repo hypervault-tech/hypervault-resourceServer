@@ -33,6 +33,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
+      "runtimeVersion": "8.9.4",
       "program": "${workspaceFolder}/server.js"
     }
   ]
