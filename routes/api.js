@@ -178,12 +178,20 @@ async function headDownloadHandler(req, res) {
     if (resource === null) return res.status(404).send();
     if (resource.status !== "AVAILABLE") return res.status(404).send();
 
-    // finally check the validity of the keys 
-    var validity = await isValidKeys(req.query.keys);
-    if ( validity != true) {
-      return res.status(401).send("The encryption keys provided are invalid. ");
+    // check if file is encrypted 
+    if( fs.existsSync( path.join(__dirname,"../", apiConfig.resourcesPath, resourceId) ) ) {
+      // the file is not encrypted
+      // do nothing for now
+    } else {
+      // finally check the validity of the keys 
+      var validity = await isValidKeys(req.query.keys);
+      if ( validity != true) {
+        return res.status(401).send("The encryption keys provided are invalid. ");
+      }
     }
+
     return res.status(202).send();
+    
   } catch(e) {
     throw e;
   }
