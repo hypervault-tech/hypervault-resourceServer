@@ -7,7 +7,7 @@
     "dev": "nodemon --ext js,njk server.js --dev",
     "test": "mocha -t 0 --recursive --exit",
     "deploy": "git checkout master; git push; ssh ubuntu@resourceserver.hypervault.tech \"bash -s\" -- <./_scripts/deploy.sh",
-    "start": "./start.sh"
+    "start": "pm2 stop resourceServer;pm2 start server.js --name=\"resourceServer\";sudo cp ./resourceserver2.hypervault.tech.conf /etc/nginx/conf.d/resourceserver2.hypervault.tech.conf;sudo systemctl restart nginx"
   },
   "repository": {
     "type": "git",
